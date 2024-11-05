@@ -9,7 +9,7 @@ Install the tool:
 go install github.com/apleshkov/tmtr
 ```
 
-Get the runtime **per project**
+Get the runtime (it's used by generated code):
 ```sh
 go get github.com/apleshkov/tmtr/funcs
 ```
