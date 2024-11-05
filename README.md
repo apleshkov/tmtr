@@ -6,7 +6,7 @@ The tool to translate Go [text](https://pkg.go.dev/text/template) and [html](htt
 
 Install the tool:
 ```sh
-go install github.com/apleshkov/tmtr
+go install github.com/apleshkov/tmtr@latest
 ```
 
 Get the runtime (it's used by generated code):
