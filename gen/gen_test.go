@@ -1063,6 +1063,22 @@ func TestExternalImports(t *testing.T) {
         }`,
 		false, 0,
 	)
+	testOutputWithOpts(
+		t, newTestGeneratorOpts(ModeHTML, nil, []string{"example.com/path/to/pkg/foo"}, nil),
+		`{{call foo.Run}}`,
+		`package main
+
+        import (
+            foo "example.com/path/to/pkg/foo"
+            io "io"
+            tmtr "github.com/apleshkov/tmtr/funcs"
+        )
+
+        func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, foo.Run()), errOutput)
+        }`,
+		false, 0,
+	)
 }
 
 func TestExternalFuncs(t *testing.T) {

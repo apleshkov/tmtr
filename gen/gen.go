@@ -86,9 +86,8 @@ func addDummyFuncs(opts GeneratorOptions, cb func(tt.FuncMap)) {
 	}
 	if opts.Imports != nil {
 		for _, n := range opts.Imports {
-			if _, n, ok := strings.Cut(n, "/"); ok {
-				fm[n] = dummyFn
-				continue
+			if i := strings.LastIndex(n, "/"); i != -1 {
+				n = n[(i + 1):]
 			}
 			fm[n] = dummyFn
 		}
@@ -144,8 +143,9 @@ func generateFile(rw *tmplWrapper, wrappers []*tmplWrapper, opts GeneratorOption
 	imports := newImports()
 	if opts.Imports != nil {
 		for _, s := range opts.Imports {
-			if _, n, ok := strings.Cut(s, "/"); ok { // e.g. "net/http"
-				imports.use(n, s, scope)
+			// e.g. "net/http", "example.com/a/b/c"
+			if i := strings.LastIndex(s, "/"); i != 1 {
+				imports.use(s[(i+1):], s, scope)
 			} else { // e.g. "math"
 				imports.use(s, s, scope)
 			}
