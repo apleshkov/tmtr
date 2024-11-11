@@ -63,7 +63,7 @@ func (g *Generator) useHTMLTemplate(in scopes.Scope) *ast.Ident {
 }
 
 func (g *Generator) useFuncs(in scopes.Scope) *ast.Ident {
-	return g.imports.use(funcsPkg, funcsPkgPath, in)
+	return g.imports.use(funcsPkg, FuncsPkgPath, in)
 }
 
 const (
@@ -72,5 +72,5 @@ const (
 	htPkg        = "ht"
 	htPkgPath    = "html/template"
 	funcsPkg     = "tmtr"
-	funcsPkgPath = "github.com/apleshkov/tmtr/funcs"
+	FuncsPkgPath = "github.com/apleshkov/tmtr/funcs"
 )

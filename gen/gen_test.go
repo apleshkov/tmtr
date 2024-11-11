@@ -999,7 +999,7 @@ func TestInternalImports(t *testing.T) {
         import (
             ht "html/template"
             io "io"
-			tmtr "github.com/apleshkov/tmtr/funcs"
+			tmtr "`+FuncsPkgPath+`"
         )
 
         func RenderTest(output io.Writer, data any, errOutput io.Writer) {
@@ -1019,7 +1019,7 @@ func TestExternalImports(t *testing.T) {
             io "io"
             math "math"
             net "net"
-			tmtr "github.com/apleshkov/tmtr/funcs"
+			tmtr "`+FuncsPkgPath+`"
             utf16 "unicode/utf16"
         )
         
@@ -1036,7 +1036,7 @@ func TestExternalImports(t *testing.T) {
         import (
             http "net/http"
             io "io"
-			tmtr "github.com/apleshkov/tmtr/funcs"
+			tmtr "`+FuncsPkgPath+`"
         )
         
         func RenderTest(output io.Writer, data any, errOutput io.Writer) {
@@ -1055,7 +1055,7 @@ func TestExternalImports(t *testing.T) {
             data_ "data"
             io "io"
             output "output"
-			tmtr "github.com/apleshkov/tmtr/funcs"
+			tmtr "`+FuncsPkgPath+`"
         )
 
         func RenderTest(output_ io.Writer, data any, errOutput io.Writer) {
@@ -1071,7 +1071,7 @@ func TestExternalImports(t *testing.T) {
         import (
             foo "example.com/path/to/pkg/foo"
             io "io"
-            tmtr "github.com/apleshkov/tmtr/funcs"
+            tmtr "`+FuncsPkgPath+`"
         )
 
         func RenderTest(output io.Writer, data any, errOutput io.Writer) {
