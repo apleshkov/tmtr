@@ -1,6 +1,6 @@
 # tmtr
 
-The tool to translate Go [text](https://pkg.go.dev/text/template) and [html](https://pkg.go.dev/html/template) templates to Go source code.
+The CLI tool to translate Go [text](https://pkg.go.dev/text/template) and [html](https://pkg.go.dev/html/template) templates to Go source code. Better with `go generate` (see <https://go.dev/blog/generate>).
 
 ## Installation
 
@@ -15,8 +15,6 @@ go get github.com/apleshkov/tmtr/funcs
 ```
 
 ## Usage
-
-The recommended approach is using `go:generate`, so it's possible to run `go generate` for concrete files or folders.
 
 ```go
 // main.go
