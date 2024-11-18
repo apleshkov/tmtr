@@ -1,0 +1,31 @@
+<html>
+
+<head>
+    <title>RCDataEscaper: {{.Title}}</title>
+</head>
+
+<body>
+    <!-- CommentEscaper: {{.Title}} -->
+    CSSEscaper: <style>
+        p {
+            background: url('{{.URL}}');
+        }
+    </style>
+    {{range .Items}}
+    <a data-a="{{.}}">AttrEscaper</a>
+    <a style="p { background: url('{{.}}'); }">CSSValueFilter</a>
+    HTMLNameFilter: <x-{{.}} />
+    <div>HTMLEscaper: {{.}}</div>
+    <script>var JSRegexpEscaper = (/{{.}}/)</script>
+    <a onclick="'{{.}}'">JSStrEscaper</a>
+    <a onclick="`{{.}}`">JSTmplLitEscaper</a>
+    <script>/* JSValEscaper: {{.}} */</script>
+    <p title={{.}}>HTMLNospaceEscaper</p>
+    SrcsetFilterAndEscaper: <img srcset="{{.}}" />
+    <a href="/?{{.}}">URLEscaper</a>
+    <a href="{{.}}">URLFilter</a>
+    <a href="/{{.}}">URLNormalizer</a>
+    {{end}}
+</body>
+
+</html>
