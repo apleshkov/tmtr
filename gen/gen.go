@@ -15,6 +15,8 @@ import (
 	"github.com/apleshkov/tmtr/scopes"
 )
 
+const Version = "0.1.12"
+
 type Mode int
 
 const (

@@ -12,7 +12,7 @@ import (
 func newUsage(fs *flag.FlagSet) func() {
 	wr := fs.Output()
 	return func() {
-		fmt.Fprintf(wr, "Usage of tmtr 0.1.11:\n")
+		fmt.Fprintf(wr, "Usage of tmtr %s:\n", gen.Version)
 		fmt.Fprintf(wr, "  tmtr [-pkg name] -fn name -type type -in file [-mode mode] [-out file] [-tpl name[:type] ...] [-import ...] [-tplfn ...]\n")
 		fmt.Fprintf(wr, "\nExamples:\n")
 		fmt.Fprintf(wr, "  # Basic usage:\n")

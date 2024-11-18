@@ -19,7 +19,7 @@ func TestUsage(t *testing.T) {
 	fs.Usage()
 	util.TestEq(
 		t, buf.String(),
-		`Usage of tmtr 0.1.11:
+		`Usage of tmtr 0.1.12:
   tmtr [-pkg name] -fn name -type type -in file [-mode mode] [-out file] [-tpl name[:type] ...] [-import ...] [-tplfn ...]
 
 Examples:
