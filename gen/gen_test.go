@@ -47,9 +47,9 @@ func TestAttrs(t *testing.T) {
 		`<span class="{{.}}">{{.}}</span>`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<span class=\"", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, data), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(data), errOutput)
             tmtr.Write(output, "\">", errOutput)
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data), errOutput)
             tmtr.Write(output, "</span>", errOutput)
         }`,
 	)
@@ -58,11 +58,11 @@ func TestAttrs(t *testing.T) {
 		`<a href="{{.}}" style="{{.}}">{{.}}</a>`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<a href=\"", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, tmtr.URLNormalizer(errOutput, tmtr.URLFilter(errOutput, data))), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.NormalizeURL(tmtr.FilterURL(errOutput, data))), errOutput)
             tmtr.Write(output, "\" style=\"", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, tmtr.CSSValueFilter(errOutput, data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.FilterCSS(data)), errOutput)
             tmtr.Write(output, "\">", errOutput)
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data), errOutput)
             tmtr.Write(output, "</a>", errOutput)
         }`,
 	)
@@ -111,42 +111,42 @@ func TestFunctions(t *testing.T) {
 		t, ModeHTML,
 		`{{and 0 1 2}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, tmtr.And(0, 1, 2)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(tmtr.And(0, 1, 2)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{or 0 1 2}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, tmtr.Or(0, 1, 2)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(tmtr.Or(0, 1, 2)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{call .X.Y 1 2}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data.X.Y(1, 2)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data.X.Y(1, 2)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{call .}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data()), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data()), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{html .}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, ht.HTMLEscaper(tmtr.EvalArgs(errOutput, data)), errOutput)
+            tmtr.Write(output, ht.HTMLEscaper(fmt.Sprint(data)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{html 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, ht.HTMLEscaper(tmtr.EvalArgs(errOutput, 1, 2, 3)), errOutput)
+            tmtr.Write(output, ht.HTMLEscaper(fmt.Sprint(1, 2, 3)), errOutput)
         }`,
 	)
 	testFuncOutput(
@@ -160,98 +160,98 @@ func TestFunctions(t *testing.T) {
 		t, ModeHTML,
 		`{{index . 0}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data[0]), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data[0]), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{index . 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data[1][2][3]), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data[1][2][3]), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{slice . 1 2}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data[1:2]), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data[1:2]), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{slice .}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data[:]), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data[:]), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{slice . 1}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data[1:]), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data[1:]), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{slice . 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data[1:2:3]), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data[1:2:3]), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{js .}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, ht.JSEscaper(data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(ht.JSEscaper(data)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{js 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, ht.JSEscaper(1, 2, 3)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(ht.JSEscaper(1, 2, 3)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{len .}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, len(data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(len(data)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{not .}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, tmtr.IsNotTrue(data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(tmtr.IsNotTrue(data)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{print 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, fmt.Sprint(1, 2, 3)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(fmt.Sprint(1, 2, 3)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{printf "%d %d %d" 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, fmt.Sprintf("%d %d %d", 1, 2, 3)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(fmt.Sprintf("%d %d %d", 1, 2, 3)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{println 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, fmt.Sprintln(1, 2, 3)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(fmt.Sprintln(1, 2, 3)), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{urlquery 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, ht.URLQueryEscaper(tmtr.EvalArgs(errOutput, 1, 2, 3))), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(ht.URLQueryEscaper(fmt.Sprint(1, 2, 3))), errOutput)
         }`,
 	)
 }
@@ -270,7 +270,7 @@ func TestMayBe(t *testing.T) {
 		t, ModeHTML,
 		`{{maybe . 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-	        tmtr.Write(output, tmtr.HTMLEscaper(errOutput, tmtr.MayBe(errOutput, func() (any, error) {
+	        tmtr.Write(output, tmtr.EscapeHTML(tmtr.MayBe(errOutput, func() (any, error) {
 	            return data(1, 2, 3)
 	        })), errOutput)
 	    }`,
@@ -282,49 +282,49 @@ func TestComparisonOps(t *testing.T) {
 		t, ModeHTML,
 		`{{eq . 1}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data == 1), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data == 1), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{eq . 1 2 3}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data == 1 || data == 2 || data == 3), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data == 1 || data == 2 || data == 3), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{ne . 1}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data != 1), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data != 1), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{lt . 1}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data < 1), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data < 1), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{le . 1}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data <= 1), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data <= 1), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{gt . 1}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data > 1), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data > 1), errOutput)
         }`,
 	)
 	testFuncOutput(
 		t, ModeHTML,
 		`{{ge . 1}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data >= 1), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data >= 1), errOutput)
         }`,
 	)
 }
@@ -652,165 +652,295 @@ func TestParentData(t *testing.T) {
 	)
 }
 
-func TestEscapers(t *testing.T) {
-	// AttrEscaper
+func TestEscapeHTMLAttr(t *testing.T) {
 	testFuncOutput(
 		t, ModeHTML,
 		`<x y="{{.}}">`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<x y=\"", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, data), errOutput)
-            tmtr.Write(output, "\">", errOutput)
-        }`,
-	)
-	// CommentEscaper
-	testFuncOutput(
-		t, ModeHTML,
-		`<!--{{.}}-->`,
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "", errOutput)
-            tmtr.Write(output, tmtr.CommentEscaper(errOutput, data), errOutput)
-            tmtr.Write(output, "", errOutput)
-        }`,
-	)
-	// CSSEscaper
-	testFuncOutput(
-		t, ModeHTML,
-		`<style>x { y: "{{.}}" }</style>`,
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<style>x { y: \"", errOutput)
-            tmtr.Write(output, tmtr.CSSEscaper(errOutput, tmtr.URLFilter(errOutput, data)), errOutput)
-            tmtr.Write(output, "\" }</style>", errOutput)
-        }`,
-	)
-	// CSSValueFilter
-	testFuncOutput(
-		t, ModeHTML,
-		`<img style="{{.}}">`,
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<img style=\"", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, tmtr.CSSValueFilter(errOutput, data)), errOutput)
-            tmtr.Write(output, "\">", errOutput)
-        }`,
-	)
-	// HTMLNameFilter
-	testFuncOutput(
-		t, ModeHTML,
-		`<x{{.}}>`,
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<x", errOutput)
-            tmtr.Write(output, tmtr.HTMLNameFilter(errOutput, data), errOutput)
-            tmtr.Write(output, ">", errOutput)
-        }`,
-	)
-	// HTMLEscaper
-	testFuncOutput(
-		t, ModeHTML,
-		`<x>{{.}}</x>`,
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<x>", errOutput)
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data), errOutput)
-            tmtr.Write(output, "</x>", errOutput)
+			tmtr.Write(output, "<x y=\"", errOutput)
+			tmtr.Write(output, tmtr.EscapeHTMLAttr(data), errOutput)
+			tmtr.Write(output, "\">", errOutput)
 		}`,
 	)
-	// JSRegexpEscaper
 	testFuncOutput(
 		t, ModeHTML,
-		`<script>(/{{.}}/)</script>`,
+		`<x y='{{.}}'>`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<script>(/", errOutput)
-            tmtr.Write(output, tmtr.JSRegexpEscaper(errOutput, data), errOutput)
-            tmtr.Write(output, "/)</script>", errOutput)
-        }`,
+			tmtr.Write(output, "<x y='", errOutput)
+			tmtr.Write(output, tmtr.EscapeHTMLAttr(data), errOutput)
+			tmtr.Write(output, "'>", errOutput)
+		}`,
 	)
-	// JSStrEscaper
-	testFuncOutput(
-		t, ModeHTML,
-		`<a onclick="'{{.}}'">`,
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<a onclick=\"'", errOutput)
-            tmtr.Write(output, tmtr.JSStrEscaper(errOutput, data), errOutput)
-            tmtr.Write(output, "'\">", errOutput)
-        }`,
-	)
-	// JSTmplLitEscaper
-	testFuncOutput(
-		t, ModeHTML,
-		"<a onclick=\"`{{.}}`\">",
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<a onclick=\"`+"`"+`", errOutput)
-            tmtr.Write(output, tmtr.JSTmplLitEscaper(errOutput, data), errOutput)
-            tmtr.Write(output, "`+"`"+`\">", errOutput)
-        }`,
-	)
-	// JSValEscaper
-	testFuncOutput(
-		t, ModeHTML,
-		`<script>{{.}}</script>`,
-		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, "<script>", errOutput)
-            tmtr.Write(output, tmtr.JSValEscaper(errOutput, data), errOutput)
-            tmtr.Write(output, "</script>", errOutput)
-        }`,
-	)
-	// HTMLNospaceEscaper
+}
+
+func TestEscapeUnquotedHTMLAttr(t *testing.T) {
 	testFuncOutput(
 		t, ModeHTML,
 		`<x y={{.}}>`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<x y=", errOutput)
-            tmtr.Write(output, tmtr.HTMLNospaceEscaper(errOutput, data), errOutput)
+            tmtr.Write(output, tmtr.EscapeUnquotedHTMLAttr(data), errOutput)
             tmtr.Write(output, ">", errOutput)
         }`,
 	)
-	// RCDataEscaper
+}
+
+func TestEscapeComment(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<!--{{.}}-->`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "", errOutput)
+            tmtr.Write(output, tmtr.EscapeComment(data), errOutput)
+            tmtr.Write(output, "", errOutput)
+        }`,
+	)
+}
+
+func TestEscapeCSS(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<style>foo { bar: "{{.}}" }</style>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<style>foo { bar: \"", errOutput)
+            tmtr.Write(output, tmtr.EscapeCSS(tmtr.FilterURL(errOutput, data)), errOutput)
+            tmtr.Write(output, "\" }</style>", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<style>foo { bar: '{{.}}' }</style>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<style>foo { bar: '", errOutput)
+            tmtr.Write(output, tmtr.EscapeCSS(tmtr.FilterURL(errOutput, data)), errOutput)
+            tmtr.Write(output, "' }</style>", errOutput)
+        }`,
+	)
+}
+
+func TestFilterCSS(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<style>{{.}}</style>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<style>", errOutput)
+            tmtr.Write(output, tmtr.FilterCSS(data), errOutput)
+            tmtr.Write(output, "</style>", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<style>body { {{.}} }</style>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<style>body { ", errOutput)
+            tmtr.Write(output, tmtr.FilterCSS(data), errOutput)
+            tmtr.Write(output, " }</style>", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<img style="{{.}}">`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<img style=\"", errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.FilterCSS(data)), errOutput)
+            tmtr.Write(output, "\">", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<span style="color: {{.}}">`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<span style=\"color: ", errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.FilterCSS(data)), errOutput)
+            tmtr.Write(output, "\">", errOutput)
+        }`,
+	)
+}
+
+func TestFilterHTMLTagContent(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<x{{.}}>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<x", errOutput)
+            tmtr.Write(output, tmtr.FilterHTMLTagContent(data), errOutput)
+            tmtr.Write(output, ">", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<x {{.}}>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<x ", errOutput)
+            tmtr.Write(output, tmtr.FilterHTMLTagContent(data), errOutput)
+            tmtr.Write(output, ">", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<x foo{{.}}>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<x foo", errOutput)
+            tmtr.Write(output, tmtr.FilterHTMLTagContent(data), errOutput)
+            tmtr.Write(output, ">", errOutput)
+        }`,
+	)
+}
+
+func TestEscapeHTML(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<x>{{.}}</x>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<x>", errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data), errOutput)
+            tmtr.Write(output, "</x>", errOutput)
+		}`,
+	)
+}
+
+func TestEscapeJSRegexp(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<script>(/{{.}}/)</script>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<script>(/", errOutput)
+            tmtr.Write(output, tmtr.EscapeJSRegexp(data), errOutput)
+            tmtr.Write(output, "/)</script>", errOutput)
+        }`,
+	)
+}
+
+func TestEscapeJSStr(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<a onclick="'{{.}}'">`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<a onclick=\"'", errOutput)
+            tmtr.Write(output, tmtr.EscapeJSStr(data), errOutput)
+            tmtr.Write(output, "'\">", errOutput)
+        }`,
+	)
+}
+
+func TestEscapeJSTmplLit(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		"<a onclick=\"`{{.}}`\">",
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<a onclick=\"`+"`"+`", errOutput)
+            tmtr.Write(output, tmtr.EscapeJSTmplLit(data), errOutput)
+            tmtr.Write(output, "`+"`"+`\">", errOutput)
+        }`,
+	)
+}
+
+func TestEscapeJS(t *testing.T) {
+	testFuncOutput(
+		t, ModeHTML,
+		`<script>{{.}}</script>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<script>", errOutput)
+            tmtr.Write(output, tmtr.EscapeJS(errOutput, data), errOutput)
+            tmtr.Write(output, "</script>", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<script>const x = {{.}};</script>`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<script>const x = ", errOutput)
+            tmtr.Write(output, tmtr.EscapeJS(errOutput, data), errOutput)
+            tmtr.Write(output, ";</script>", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		"<a onblur=\"{{.}}\">",
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<a onblur=\"", errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.EscapeJS(errOutput, data)), errOutput)
+            tmtr.Write(output, "\">", errOutput)
+        }`,
+	)
+}
+
+func TestEscapeRCData(t *testing.T) {
 	testFuncOutput(
 		t, ModeHTML,
 		`<title>{{.}}</title>`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<title>", errOutput)
-            tmtr.Write(output, tmtr.RCDataEscaper(errOutput, data), errOutput)
+            tmtr.Write(output, tmtr.EscapeRCData(data), errOutput)
             tmtr.Write(output, "</title>", errOutput)
         }`,
 	)
-	// SrcsetFilterAndEscaper
+}
+
+func TestFilterAndEscapeSrcset(t *testing.T) {
 	testFuncOutput(
 		t, ModeHTML,
 		`<x srcset="{{.}}">`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<x srcset=\"", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, tmtr.SrcsetFilterAndEscaper(errOutput, data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.FilterAndEscapeSrcset(errOutput, data)), errOutput)
             tmtr.Write(output, "\">", errOutput)
         }`,
 	)
-	// URLEscaper
+	testFuncOutput(
+		t, ModeHTML,
+		`<x srcset="{{.A}},{{.B}}">`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<x srcset=\"", errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.FilterAndEscapeSrcset(errOutput, data.A)), errOutput)
+            tmtr.Write(output, ",", errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.FilterAndEscapeSrcset(errOutput, data.B)), errOutput)
+            tmtr.Write(output, "\">", errOutput)
+        }`,
+	)
+}
+
+func TestEscapeURL(t *testing.T) {
 	testFuncOutput(
 		t, ModeHTML,
 		`<x href="/?{{.}}">`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<x href=\"/?", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, tmtr.URLEscaper(errOutput, data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.EscapeURL(data)), errOutput)
             tmtr.Write(output, "\">", errOutput)
         }`,
 	)
-	// URLFilter
+}
+
+func TestFilterURL(t *testing.T) {
 	testFuncOutput(
 		t, ModeHTML,
 		`<x href="{{.}}">`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<x href=\"", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, tmtr.URLNormalizer(errOutput, tmtr.URLFilter(errOutput, data))), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.NormalizeURL(tmtr.FilterURL(errOutput, data))), errOutput)
             tmtr.Write(output, "\">", errOutput)
         }`,
 	)
-	// URLNormalizer
+}
+
+func TestNormalizeURL(t *testing.T) {
 	testFuncOutput(
 		t, ModeHTML,
 		`<x href="/{{.}}">`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<x href=\"/", errOutput)
-            tmtr.Write(output, tmtr.AttrEscaper(errOutput, tmtr.URLNormalizer(errOutput, data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.NormalizeURL(data)), errOutput)
             tmtr.Write(output, "\">", errOutput)
+        }`,
+	)
+	testFuncOutput(
+		t, ModeHTML,
+		`<x style="background: url('{{.}}')">`,
+		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
+            tmtr.Write(output, "<x style=\"background: url('", errOutput)
+            tmtr.Write(output, tmtr.EscapeHTMLAttr(tmtr.NormalizeURL(tmtr.FilterURL(errOutput, data))), errOutput)
+            tmtr.Write(output, "')\">", errOutput)
         }`,
 	)
 }
@@ -938,7 +1068,7 @@ func TestDefinedTemplates(t *testing.T) {
         }
         func RenderTestFoo(output io.Writer, data any, errOutput io.Writer) {
             tmtr.Write(output, "<p>", errOutput)
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, data), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(data), errOutput)
             tmtr.Write(output, "</p>", errOutput)
         }`,
 	)
@@ -1040,7 +1170,7 @@ func TestExternalImports(t *testing.T) {
         )
         
         func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, http.MethodConnect), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(http.MethodConnect), errOutput)
         }`,
 		false, 0,
 	)
@@ -1059,7 +1189,7 @@ func TestExternalImports(t *testing.T) {
         )
 
         func RenderTest(output_ io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output_, tmtr.HTMLEscaper(errOutput, data.Data), errOutput)
+            tmtr.Write(output_, tmtr.EscapeHTML(data.Data), errOutput)
         }`,
 		false, 0,
 	)
@@ -1075,7 +1205,7 @@ func TestExternalImports(t *testing.T) {
         )
 
         func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, foo.Run()), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(foo.Run()), errOutput)
         }`,
 		false, 0,
 	)
@@ -1095,8 +1225,8 @@ func TestExternalFuncs(t *testing.T) {
 		t, newTestGeneratorOpts(ModeHTML, nil, nil, []string{"foo", "bar"}),
 		`{{foo .}}{{. | bar}}`,
 		`func RenderTest(output io.Writer, data any, errOutput io.Writer) {
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, foo(data)), errOutput)
-            tmtr.Write(output, tmtr.HTMLEscaper(errOutput, bar(data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(foo(data)), errOutput)
+            tmtr.Write(output, tmtr.EscapeHTML(bar(data)), errOutput)
         }`,
 		true, 0,
 	)

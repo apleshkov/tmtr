@@ -2,6 +2,26 @@
 
 The CLI tool to translate Go [text](https://pkg.go.dev/text/template) and [html](https://pkg.go.dev/html/template) templates to Go source code. Better with `go generate` (see <https://go.dev/blog/generate>).
 
+Generated static code becomes a part of a project, so it's checked by the compiler, hence a lot of mistakes and errors could be catched way before the runtime.
+
+Also it's faster:
+```sh
+$ cd ./bench
+$ go test -bench .
+goos: darwin
+goarch: arm64
+pkg: bench
+cpu: Apple M3 Pro
+# A lot of different escapers, see ./bench/lotsofesc.html.txt
+BenchmarkGeneratedEscapers-11    	  202416	      5936 ns/op
+BenchmarkTemplateEscapers-11     	   83209	     14402 ns/op
+# Just `<div>{{.}}</div>`, see ./bench/basic.html
+BenchmarkGeneratedBasic-11       	 6320578	       188.6 ns/op
+BenchmarkTemplateBasic-11        	 2511336	       479.6 ns/op
+PASS
+ok  	bench	6.870s
+```
+
 ## Installation
 
 Install the tool:
@@ -176,3 +196,9 @@ func RenderData(output io.Writer, data myData, foo func(io.Writer, io.Writer), e
 	foo(output, errOutput)
 }
 ```
+
+## Security Notes
+
+The tool uses the `html/template` escaping mechanism, so all the necessary [sanitizing functions](https://pkg.go.dev/html/template#hdr-Contexts) will be added.
+
+But please keep in mind these sanitizing functions are *re-implemented with some changes*, cause the original ones are private to the `html/template` package. There's a [proposal](https://github.com/golang/go/issues/70375) to export them though.

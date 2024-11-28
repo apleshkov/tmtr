@@ -17,15 +17,6 @@ func (g *Generator) nodeExpr(n parse.Node, scope scopes.Scope) ast.Expr {
 	}
 	if n, ok := n.(*parse.IdentifierNode); ok {
 		s := n.Ident
-		if s, ok := tmplFnNameMap[s]; ok {
-			return &ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   g.useFuncs(scope),
-					Sel: ast.NewIdent(s),
-				},
-				Args: []ast.Expr{g.eoutIdent},
-			}
-		}
 		switch s {
 		case "and":
 			return &ast.SelectorExpr{
@@ -52,7 +43,7 @@ func (g *Generator) nodeExpr(n parse.Node, scope scopes.Scope) ast.Expr {
 				X:   g.useFuncs(scope),
 				Sel: isNotTrueIdent,
 			}
-		case "print":
+		case "print", "_eval_args_":
 			return &ast.SelectorExpr{
 				X:   g.useFmt(scope),
 				Sel: sprintIdent,
@@ -71,6 +62,95 @@ func (g *Generator) nodeExpr(n parse.Node, scope scopes.Scope) ast.Expr {
 			return &ast.SelectorExpr{
 				X:   g.useHTMLTemplate(scope),
 				Sel: urlQueryEscaperIdent,
+			}
+		case "_html_template_attrescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeHTMLAttrIdent,
+			}
+		case "_html_template_commentescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeCommentIdent,
+			}
+		case "_html_template_cssescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeCSSIdent,
+			}
+		case "_html_template_cssvaluefilter":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: filterCSSIdent,
+			}
+		case "_html_template_htmlnamefilter":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: filterHTMLTagContentIdent,
+			}
+		case "_html_template_htmlescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeHTMLIdent,
+			}
+		case "_html_template_jsregexpescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeJSRegexpIdent,
+			}
+		case "_html_template_jsstrescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeJSStrIdent,
+			}
+		case "_html_template_jstmpllitescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeJSTmplLitIdent,
+			}
+		case "_html_template_jsvalescaper":
+			return &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   g.useFuncs(scope),
+					Sel: escapeJSIdent,
+				},
+				Args: []ast.Expr{g.eoutIdent},
+			}
+		case "_html_template_nospaceescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeUnquotedHTMLAttrIdent,
+			}
+		case "_html_template_rcdataescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeRCDataIdent,
+			}
+		case "_html_template_srcsetescaper":
+			return &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   g.useFuncs(scope),
+					Sel: filterAndEscapeSrcsetIdent,
+				},
+				Args: []ast.Expr{g.eoutIdent},
+			}
+		case "_html_template_urlescaper":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: escapeURLIdent,
+			}
+		case "_html_template_urlfilter":
+			return &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   g.useFuncs(scope),
+					Sel: filterURLIdent,
+				},
+				Args: []ast.Expr{g.eoutIdent},
+			}
+		case "_html_template_urlnormalizer":
+			return &ast.SelectorExpr{
+				X:   g.useFuncs(scope),
+				Sel: normalizeURLIdent,
 			}
 		default:
 			return ast.NewIdent(s)
@@ -370,24 +450,4 @@ func (g *Generator) cmdsExpr(cmds []*parse.CommandNode, scope scopes.Scope) ast.
 	}
 	fmt.Fprintln(os.Stderr, "[expr] empty commands")
 	return &ast.BadExpr{}
-}
-
-var tmplFnNameMap = map[string]string{
-	"_html_template_attrescaper":      "AttrEscaper",
-	"_html_template_commentescaper":   "CommentEscaper",
-	"_html_template_cssescaper":       "CSSEscaper",
-	"_html_template_cssvaluefilter":   "CSSValueFilter",
-	"_html_template_htmlnamefilter":   "HTMLNameFilter",
-	"_html_template_htmlescaper":      "HTMLEscaper",
-	"_html_template_jsregexpescaper":  "JSRegexpEscaper",
-	"_html_template_jsstrescaper":     "JSStrEscaper",
-	"_html_template_jstmpllitescaper": "JSTmplLitEscaper",
-	"_html_template_jsvalescaper":     "JSValEscaper",
-	"_html_template_nospaceescaper":   "HTMLNospaceEscaper",
-	"_html_template_rcdataescaper":    "RCDataEscaper",
-	"_html_template_srcsetescaper":    "SrcsetFilterAndEscaper",
-	"_html_template_urlescaper":       "URLEscaper",
-	"_html_template_urlfilter":        "URLFilter",
-	"_html_template_urlnormalizer":    "URLNormalizer",
-	"_eval_args_":                     "EvalArgs",
 }

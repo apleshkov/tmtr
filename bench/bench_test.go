@@ -6,19 +6,37 @@ import (
 	"testing"
 )
 
+const orly = `O'Reilly: How are <i>you</i>?`
+
+//go:generate tmtr -fn lotsofesc -type string -in ./lotsofesc.html.txt -mode html
+
 func BenchmarkGeneratedEscapers(b *testing.B) {
-	d := newBenchData()
 	for range b.N {
-		lotsofesc(io.Discard, &d, nil)
+		lotsofesc(io.Discard, orly, nil)
 	}
 }
 
-func BenchmarkBuiltinEscapers(b *testing.B) {
-	t := template.Must(template.ParseFiles("./lotsofesc.html"))
-	b.ResetTimer()
-	d := newBenchData()
+func BenchmarkTemplateEscapers(b *testing.B) {
+	t := template.Must(template.ParseFiles("./lotsofesc.html.txt"))
 	for range b.N {
-		if err := t.Execute(io.Discard, &d); err != nil {
+		if err := t.Execute(io.Discard, orly); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+//go:generate tmtr -fn basic -type string -in ./basic.html
+
+func BenchmarkGeneratedBasic(b *testing.B) {
+	for range b.N {
+		basic(io.Discard, orly, nil)
+	}
+}
+
+func BenchmarkTemplateBasic(b *testing.B) {
+	t := template.Must(template.ParseFiles("./basic.html"))
+	for range b.N {
+		if err := t.Execute(io.Discard, orly); err != nil {
 			b.Fatal(err)
 		}
 	}

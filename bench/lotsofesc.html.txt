@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>{{.}}</title>
+</head>
+<body>
+    {{if .}}
+        <!-- {{.}} -->
+        <style>
+            p {
+                background: url('{{.}}');
+            }
+        </style>
+        <a data-a="{{.}}">{{.}}</a>
+        <a style="p { background: url('{{.}}'); }">{{.}}</a>
+        <x-{{.}} />
+        <div>{{.}}</div>
+        <script>const re = /{{.}}/;</script>
+        <a onclick="'{{.}}'">{{.}}</a>
+        <a onclick="`{{.}}`">{{.}}</a>
+        <script>{{.}}</script>
+        <p title={{.}}>{{.}}</p>
+        <img srcset="{{.}}" />
+        <a href="/?{{.}}">{{.}}</a>
+        <a href="{{.}}">{{.}}</a>
+        <a href="/{{.}}">{{.}}</a>
+    {{end}}
+</body>
+</html>
