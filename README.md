@@ -1,10 +1,11 @@
 # tmtr
 
-The CLI tool to translate Go [text](https://pkg.go.dev/text/template) and [html](https://pkg.go.dev/html/template) templates to Go source code. Better with `go generate` (see <https://go.dev/blog/generate>).
+The CLI tool to generate static type-safe Go source code from [html/template](https://pkg.go.dev/html/template) or [text/template](https://pkg.go.dev/text/template).
 
-Generated static code becomes a part of a project, so it's checked by the compiler, hence a lot of mistakes and errors could be catched way before the runtime.
+Better with `go generate` (see <https://go.dev/blog/generate>).
 
-Also it's faster:
+## Benchmarks
+
 ```sh
 $ cd ./bench
 $ go test -bench .
